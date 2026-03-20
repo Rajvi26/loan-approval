@@ -1,3 +1,9 @@
+# ============================================================
+# Loan Approval Prediction Application
+# This Flask-based web application predicts loan approval
+# using machine learning models (Random Forest Classifier)
+# ============================================================
+
 from flask import Flask, render_template, request, jsonify
 import pandas as pd
 import numpy as np
@@ -77,30 +83,103 @@ def predict():
 
         reasons = []
 
+        # Helper: build rejection report
+        def build_report(primary_reason, rejection_reasons, suggestions):
+            return {
+                "summary": primary_reason,
+                "rejection_reasons": rejection_reasons,
+                "applicant_snapshot": {
+                    "Age": age,
+                    "Monthly Income": f"₹{income:,}",
+                    "Loan Amount": f"₹{loan_amount:,}",
+                    "Credit Score": credit_score,
+                    "Months Employed": months_employed,
+                    "Credit Lines": num_credit_lines,
+                    "Loan Term": f"{loan_term} months",
+                    "Purpose": purpose
+                },
+                "suggestions": suggestions
+            }
+
         # AGE RULE
         if age < 18 or age > 59:
+            report = build_report(
+                "Your age does not meet our eligibility criteria.",
+                [
+                    {
+                        "title": "Age Out of Range",
+                        "description": f"Your age ({age}) is outside the eligible range of 18–59 years.",
+                        "your_value": str(age),
+                        "required": "18 – 59 years"
+                    }
+                ],
+                [
+                    "Applicants must be at least 18 years old to apply.",
+                    "The maximum eligible age for a new loan is 59 years.",
+                    "If you are close to the age limit, consider applying with a co-applicant who meets the criteria."
+                ]
+            )
             return jsonify({
                 "status": "rejected",
-                "reason": "Age must be between 18–59",
-                "details": []
+                "reason": f"Age ({age}) must be between 18–59",
+                "details": ["Age must be between 18–59 years"],
+                "report": report
             })
 
-        # CREDIT RULE
+        # CREDIT RULE (Young applicants)
         if age <= 27 and not (100 <= credit_score <= 450):
+            report = build_report(
+                "Your credit score does not meet the requirement for your age group.",
+                [
+                    {
+                        "title": "Credit Score Mismatch (Age 18–27)",
+                        "description": f"Applicants aged 18–27 must have a credit score between 100 and 450. Your score is {credit_score}.",
+                        "your_value": str(credit_score),
+                        "required": "100 – 450"
+                    }
+                ],
+                [
+                    "For the 18–27 age group, we use a different credit scoring scale (100–450).",
+                    f"Your current credit score of {credit_score} {'exceeds' if credit_score > 450 else 'is below'} this range.",
+                    "Ensure your credit report is up-to-date and consider correcting any discrepancies.",
+                    "Building a stronger credit history through timely payments can improve your score."
+                ]
+            )
             return jsonify({
                 "status": "rejected",
-                "reason": "Credit score rule failed (age 18–27 requires score 100–450)",
-                "details": []
+                "reason": f"Credit score rule failed (age 18–27 requires score 100–450)",
+                "details": [f"Credit Score ({credit_score}) outside required range 100–450 for age group 18–27"],
+                "report": report
             })
 
+        # CREDIT RULE (Older applicants)
         if age > 27 and not (500 <= credit_score <= 900):
+            report = build_report(
+                "Your credit score is below the minimum requirement for your age group.",
+                [
+                    {
+                        "title": "Credit Score Too Low (Age 28+)",
+                        "description": f"Applicants aged 28 and above need a credit score between 500 and 900. Your score is {credit_score}.",
+                        "your_value": str(credit_score),
+                        "required": "500 – 900"
+                    }
+                ],
+                [
+                    f"Your credit score of {credit_score} is {'below the minimum of 500' if credit_score < 500 else 'above the maximum of 900'}.",
+                    "Pay off outstanding debts and avoid late payments to gradually improve your score.",
+                    "Review your credit report for errors that may be dragging your score down.",
+                    "Maintain a low credit utilization ratio (below 30%) for a healthier score.",
+                    "Consider waiting 3–6 months while building credit before re-applying."
+                ]
+            )
             return jsonify({
                 "status": "rejected",
-                "reason": "Credit score too low (age 28+ requires score 500–900)",
-                "details": []
+                "reason": f"Credit score too low (age 28+ requires score 500–900)",
+                "details": [f"Credit Score ({credit_score}) outside required range 500–900 for age group 28+"],
+                "report": report
             })
 
-        # AUTO INTEREST
+        # INTEREST RATE
         if purpose == "Home":
             interest = 8 if income > 50000 else 10
         elif purpose == "Auto":
@@ -111,13 +190,36 @@ def predict():
         # EMI CALCULATION
         emi = calculate_emi(loan_amount, interest, loan_term)
         emi_ratio = emi / income
+        max_allowed_emi = 0.5 * income
 
         # EMI RULE
-        if emi > 0.5 * income:
+        if emi > max_allowed_emi:
+            report = build_report(
+                "Your monthly EMI would exceed 50% of your income, which is too high.",
+                [
+                    {
+                        "title": "EMI-to-Income Ratio Exceeded",
+                        "description": f"Your estimated EMI of ₹{round(emi):,} is {round(emi_ratio * 100, 1)}% of your monthly income (₹{income:,}). Maximum allowed is 50%.",
+                        "your_value": f"₹{round(emi):,} ({round(emi_ratio * 100, 1)}%)",
+                        "required": f"≤ ₹{round(max_allowed_emi):,} (50% of income)"
+                    }
+                ],
+                [
+                    f"Your EMI of ₹{round(emi):,} exceeds the safe limit of ₹{round(max_allowed_emi):,} (50% of income).",
+                    f"Consider reducing your loan amount from ₹{loan_amount:,} to a lower amount.",
+                    f"Increasing the loan term beyond {loan_term} months will reduce the monthly EMI.",
+                    "Alternatively, demonstrating a higher monthly income may help qualify.",
+                    "You could also consider a smaller loan with a co-applicant."
+                ]
+            )
             return jsonify({
                 "status": "rejected",
                 "reason": "EMI exceeds 50% of monthly income",
-                "details": []
+                "details": [
+                    f"Monthly EMI (₹{round(emi):,}) exceeds 50% of income (₹{income:,})",
+                    f"EMI-to-Income ratio: {round(emi_ratio * 100, 1)}% (max allowed: 50%)"
+                ],
+                "report": report
             })
         else:
             reasons.append("EMI within safe limit")
@@ -145,11 +247,81 @@ def predict():
                 "details": reasons
             })
         else:
+            # ML rejection - build comprehensive report
+            risk_factors = []
+            ml_suggestions = []
+
+            # Analyse contributing factors
+            if credit_score < 600:
+                risk_factors.append({
+                    "title": "Low Credit Score",
+                    "description": f"Your credit score of {credit_score} is on the lower side, which increases perceived risk.",
+                    "your_value": str(credit_score),
+                    "required": "600+ recommended"
+                })
+                ml_suggestions.append("Improve your credit score by paying bills on time and reducing outstanding debt.")
+
+            if emi_ratio > 0.35:
+                risk_factors.append({
+                    "title": "High EMI-to-Income Ratio",
+                    "description": f"Your EMI would be {round(emi_ratio * 100, 1)}% of your income. A ratio above 35% signals financial strain.",
+                    "your_value": f"{round(emi_ratio * 100, 1)}%",
+                    "required": "Below 35% recommended"
+                })
+                ml_suggestions.append("Reduce the loan amount or increase the loan term to lower the EMI burden.")
+
+            if months_employed < 12:
+                risk_factors.append({
+                    "title": "Limited Employment History",
+                    "description": f"You have only {months_employed} months of employment. Lenders prefer stable, longer employment.",
+                    "your_value": f"{months_employed} months",
+                    "required": "12+ months recommended"
+                })
+                ml_suggestions.append("A longer employment history demonstrates income stability. Consider re-applying after gaining more experience.")
+
+            if loan_amount > income * 10:
+                risk_factors.append({
+                    "title": "High Loan-to-Income Multiple",
+                    "description": f"The requested loan (₹{loan_amount:,}) is {round(loan_amount/income, 1)}x your monthly income. This is considered high risk.",
+                    "your_value": f"{round(loan_amount/income, 1)}x income",
+                    "required": "Below 10x recommended"
+                })
+                ml_suggestions.append("Request a lower loan amount relative to your income for better approval odds.")
+
+            if num_credit_lines >= 6:
+                risk_factors.append({
+                    "title": "Too Many Credit Lines",
+                    "description": f"Having {num_credit_lines} active credit lines suggests over-leverage.",
+                    "your_value": str(num_credit_lines),
+                    "required": "Below 6 recommended"
+                })
+                ml_suggestions.append("Close unused credit lines to reduce your overall debt exposure.")
+
+            # If no specific factor was identified, add a general one
+            if not risk_factors:
+                risk_factors.append({
+                    "title": "Overall Risk Profile",
+                    "description": "Our AI model assessed your combined financial profile as high risk based on multiple factors.",
+                    "your_value": "High Risk",
+                    "required": "Low Risk"
+                })
+                ml_suggestions.append("Consider applying with a co-applicant or guarantor to strengthen your application.")
+                ml_suggestions.append("Reduce the loan amount or choose a longer repayment term.")
+
+            ml_suggestions.append("You may re-apply after improving the factors highlighted above.")
+
+            report = build_report(
+                "Our AI model has identified your application as high risk based on your financial profile.",
+                risk_factors,
+                ml_suggestions
+            )
+
             return jsonify({
                 "status": "rejected",
-                "reason": "ML model: High Risk",
+                "reason": "AI Model Assessment: High Risk Profile",
                 "probability": round(prob[0] * 100, 2),
-                "details": ["ML model: High Risk"]
+                "details": [f"ML Risk Probability: {round(prob[1] * 100, 2)}%"],
+                "report": report
             })
 
     except Exception as e:

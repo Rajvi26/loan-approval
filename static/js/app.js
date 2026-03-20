@@ -221,6 +221,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 </div>
             `;
         } else if (data.status === "rejected") {
+            const report = data.report;
+
             html = `
                 <div class="result-card rejected">
                     <div class="result-status">
@@ -242,6 +244,82 @@ document.addEventListener("DOMContentLoaded", () => {
                         </div>
                     ` : ""}
                 </div>
+
+                ${report ? `
+                <!-- ======== REJECTION REPORT ======== -->
+                <div class="rejection-report" id="rejectionReport">
+                    <div class="report-header">
+                        <div class="report-header-icon">📋</div>
+                        <div>
+                            <h3>Detailed Rejection Report</h3>
+                            <p class="report-timestamp">Generated on ${new Date().toLocaleString("en-IN", { dateStyle: "long", timeStyle: "short" })}</p>
+                        </div>
+                    </div>
+
+                    <!-- Summary -->
+                    <div class="report-summary">
+                        <div class="report-summary-icon">💡</div>
+                        <p>${report.summary}</p>
+                    </div>
+
+                    <!-- Rejection Reasons -->
+                    <div class="report-section">
+                        <h4><span class="report-section-icon">⚠️</span> Why Was Your Loan Rejected?</h4>
+                        <div class="report-reasons-grid">
+                            ${report.rejection_reasons.map(r => `
+                                <div class="report-reason-card">
+                                    <div class="reason-title">
+                                        <span class="reason-dot"></span>
+                                        ${r.title}
+                                    </div>
+                                    <p class="reason-description">${r.description}</p>
+                                    <div class="reason-comparison">
+                                        <div class="comparison-item yours">
+                                            <span class="comparison-label">Your Value</span>
+                                            <span class="comparison-value">${r.your_value}</span>
+                                        </div>
+                                        <div class="comparison-arrow">→</div>
+                                        <div class="comparison-item required">
+                                            <span class="comparison-label">Required</span>
+                                            <span class="comparison-value">${r.required}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            `).join("")}
+                        </div>
+                    </div>
+
+                    <!-- Applicant Snapshot -->
+                    <div class="report-section">
+                        <h4><span class="report-section-icon">👤</span> Your Application Snapshot</h4>
+                        <div class="snapshot-grid">
+                            ${Object.entries(report.applicant_snapshot).map(([key, val]) => `
+                                <div class="snapshot-item">
+                                    <span class="snapshot-label">${key}</span>
+                                    <span class="snapshot-value">${val}</span>
+                                </div>
+                            `).join("")}
+                        </div>
+                    </div>
+
+                    <!-- Suggestions -->
+                    <div class="report-section">
+                        <h4><span class="report-section-icon">✅</span> What Can You Do Next?</h4>
+                        <div class="suggestions-list">
+                            ${report.suggestions.map((s, i) => `
+                                <div class="suggestion-item">
+                                    <span class="suggestion-number">${i + 1}</span>
+                                    <span class="suggestion-text">${s}</span>
+                                </div>
+                            `).join("")}
+                        </div>
+                    </div>
+
+                    <div class="report-footer">
+                        <p>📞 Need Help? Contact our support team for personalized guidance on improving your eligibility.</p>
+                    </div>
+                </div>
+                ` : ""}
             `;
         } else {
             html = `
