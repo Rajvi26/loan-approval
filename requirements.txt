@@ -1,0 +1,12 @@
+click==8.3.1
+colorama==0.4.6
+flask==3.1.1
+Jinja2==3.1.6
+joblib==1.5.3
+MarkupSafe==3.0.3
+numpy==2.4.2
+pandas==2.3.3
+scikit-learn==1.6.1
+scipy==1.17.1
+threadpoolctl==3.6.0
+xgboost==3.2.0
