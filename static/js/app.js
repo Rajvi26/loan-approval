@@ -219,6 +219,125 @@ document.addEventListener("DOMContentLoaded", () => {
                         </div>
                     ` : ""}
                 </div>
+
+                <!-- ======== APPROVAL REPORT ======== -->
+                <div class="approval-report" id="approvalReport">
+                    <div class="report-header approval-header">
+                        <div class="report-header-icon">🎉</div>
+                        <div>
+                            <h3>Loan Approval Report</h3>
+                            <p class="report-timestamp">Generated on ${new Date().toLocaleString("en-IN", { dateStyle: "long", timeStyle: "short" })}</p>
+                        </div>
+                    </div>
+
+                    <!-- Congratulation Message -->
+                    <div class="report-summary approval-summary">
+                        <div class="report-summary-icon">🌟</div>
+                        <div>
+                            <p><strong>Heartfelt Congratulations!</strong> Your loan application has been successfully approved. We are delighted to assist you in achieving your financial goals.</p>
+                        </div>
+                    </div>
+
+                    <!-- Approval Details -->
+                    <div class="report-section">
+                        <h4><span class="report-section-icon">📋</span> Loan Approval Summary</h4>
+                        <div class="approval-details-grid">
+                            <div class="approval-detail-card">
+                                <div class="detail-icon">💰</div>
+                                <div class="detail-info">
+                                    <span class="detail-label">Approved Loan Amount</span>
+                                    <span class="detail-value">₹${parseInt(document.getElementById("loan_amount").value).toLocaleString("en-IN")}</span>
+                                </div>
+                            </div>
+                            <div class="approval-detail-card">
+                                <div class="detail-icon">📅</div>
+                                <div class="detail-info">
+                                    <span class="detail-label">Loan Tenure</span>
+                                    <span class="detail-value">${document.getElementById("loan_term").value} Months</span>
+                                </div>
+                            </div>
+                            <div class="approval-detail-card">
+                                <div class="detail-icon">📊</div>
+                                <div class="detail-info">
+                                    <span class="detail-label">Interest Rate</span>
+                                    <span class="detail-value">${data.interest_rate}% p.a.</span>
+                                </div>
+                            </div>
+                            <div class="approval-detail-card">
+                                <div class="detail-icon">💳</div>
+                                <div class="detail-info">
+                                    <span class="detail-label">Monthly EMI</span>
+                                    <span class="detail-value">₹${data.emi.toLocaleString("en-IN")}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Applicant Strengths -->
+                    <div class="report-section">
+                        <h4><span class="report-section-icon">⭐</span> Your Strengths</h4>
+                        <div class="strengths-list">
+                            ${data.details && data.details.length > 0 ? data.details.map((d, i) => `
+                                <div class="strength-item">
+                                    <span class="strength-number">✓</span>
+                                    <span class="strength-text">${d}</span>
+                                </div>
+                            `).join("") : `
+                                <div class="strength-item">
+                                    <span class="strength-number">✓</span>
+                                    <span class="strength-text">Your profile meets all approval criteria</span>
+                                </div>
+                            `}
+                        </div>
+                    </div>
+
+                    <!-- Next Steps -->
+                    <div class="report-section">
+                        <h4><span class="report-section-icon">🚀</span> Next Steps</h4>
+                        <div class="next-steps-list">
+                            <div class="step-item">
+                                <span class="step-number">1</span>
+                                <div class="step-info">
+                                    <span class="step-title">Review Your Terms</span>
+                                    <span class="step-description">Carefully review the approved loan amount, interest rate, and tenure mentioned above.</span>
+                                </div>
+                            </div>
+                            <div class="step-item">
+                                <span class="step-number">2</span>
+                                <div class="step-info">
+                                    <span class="step-title">Schedule Documentation</span>
+                                    <span class="step-description">Contact our team to schedule an appointment for document verification and final processing.</span>
+                                </div>
+                            </div>
+                            <div class="step-item">
+                                <span class="step-number">3</span>
+                                <div class="step-info">
+                                    <span class="step-title">Fund Disbursement</span>
+                                    <span class="step-description">Upon completion of formalities, funds will be disbursed directly to your registered bank account.</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Terms & Conditions -->
+                    <div class="report-section">
+                        <h4><span class="report-section-icon">⚖️</span> Important Terms</h4>
+                        <div class="terms-box">
+                            <ul class="terms-list">
+                                <li>EMI payments must be made by the due date each month to maintain a good credit record.</li>
+                                <li>Prepayment penalties may apply. Please contact us for details on prepayment options.</li>
+                                <li>This approval is valid for 30 days from the date of generation.</li>
+                                <li>The interest rate is subject to applicable GST as per RBI guidelines.</li>
+                                <li>Full terms and conditions are detailed in the loan agreement document.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="report-footer approval-footer">
+                        <p>📞 Have questions? Our dedicated support team is here to help you 24/7. Contact us anytime for assistance.</p>
+                        <p class="footer-gratitude">Thank you for choosing us. We look forward to a successful partnership!</p>
+                    </div>
+                </div>
             `;
         } else if (data.status === "rejected") {
             const report = data.report;
@@ -228,8 +347,8 @@ document.addEventListener("DOMContentLoaded", () => {
                     <div class="result-status">
                         <div class="result-status-icon">❌</div>
                         <div class="result-status-text">
-                            <h3>Loan Rejected</h3>
-                            <p>${data.reason || "Your application did not meet the approval criteria."}</p>
+                            <h3>Loan Application Declined</h3>
+                            <p><strong>Rejection Reason:</strong> ${data.reason || "Your application did not meet the approval criteria."}</p>
                         </div>
                     </div>
 
@@ -248,17 +367,17 @@ document.addEventListener("DOMContentLoaded", () => {
                 ${report ? `
                 <!-- ======== REJECTION REPORT ======== -->
                 <div class="rejection-report" id="rejectionReport">
-                    <div class="report-header">
+                    <div class="report-header rejection-header">
                         <div class="report-header-icon">📋</div>
                         <div>
-                            <h3>Detailed Rejection Report</h3>
+                            <h3>Loan Application Rejection Report</h3>
                             <p class="report-timestamp">Generated on ${new Date().toLocaleString("en-IN", { dateStyle: "long", timeStyle: "short" })}</p>
                         </div>
                     </div>
 
                     <!-- Summary -->
-                    <div class="report-summary">
-                        <div class="report-summary-icon">💡</div>
+                    <div class="report-summary rejection-summary">
+                        <div class="report-summary-icon">ℹ️</div>
                         <p>${report.summary}</p>
                     </div>
 
