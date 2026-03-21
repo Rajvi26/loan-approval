@@ -12,38 +12,32 @@
 </head>
 <body>
 
-    <!-- ======== SIDEBAR ======== -->
-    <aside class="sidebar" id="sidebar">
-        <!-- Logo -->
-        <div class="sidebar-logo">
-            <img src="{{ url_for('static', filename='data_vidwan_logo.png') }}" alt="Data Vidwan" class="logo-img">
+    <!-- ======== NAVBAR ======== -->
+    <header class="navbar">
+        <div class="navbar-left">
+            <div class="navbar-brand">
+                <img src="{{ url_for('static', filename='data_vidwan_logo.png') }}" alt="Data Vidwan" class="logo-img">
+                <span>AI Loan Approval System</span>
+            </div>
+            <nav class="navbar-nav">
+                <a href="#" class="nav-link active" data-section="predict">Loan Prediction</a>
+                <a href="#" class="nav-link" data-section="emi-calc">EMI Calculator</a>
+                <a href="#" class="nav-link" data-section="about">About</a>
+            </nav>
         </div>
 
-        <div class="sidebar-divider"></div>
+        <div class="navbar-right">
+            <div class="user-profile">
+                <span class="profile-icon">👤</span>
+                <span class="user-email">{{ session.email }}</span>
+                <a href="{{ url_for('logout') }}" class="logout-link-top">Logout</a>
+            </div>
+        </div>
+    </header>
 
-        <!-- Navigation / Options -->
-        <nav class="sidebar-nav">
-            <div class="nav-label">Navigation</div>
-            <a href="#" class="nav-item active" data-section="predict">
-                <span class="nav-icon">🤖</span>
-                <span class="nav-text">Loan Prediction</span>
-            </a>
-            <a href="#" class="nav-item" data-section="emi-calc">
-                <span class="nav-icon">🧮</span>
-                <span class="nav-text">EMI Calculator</span>
-            </a>
-            <a href="#" class="nav-item" data-section="about">
-                <span class="nav-icon">ℹ️</span>
-                <span class="nav-text">About System</span>
-            </a>
-        </nav>
-
-        <div class="sidebar-divider"></div>
-
-        <!-- User Inputs in Sidebar -->
-        <div class="sidebar-form-section">
-            <div class="nav-label">Applicant Details</div>
-
+    <div class="page-container">
+        <aside class="side-panel">
+            <h2>Applicant Details</h2>
             <form id="loanForm" autocomplete="off">
                 <div class="sidebar-input-group">
                     <label for="age"><span class="field-icon">👤</span> Age</label>
@@ -73,10 +67,7 @@
                     <input type="number" id="num_credit_lines" name="num_credit_lines" min="0" value="2" required>
                 </div>
 
-                <div class="sidebar-divider"></div>
-
-                <div class="nav-label">Loan Details</div>
-
+                <h3>Loan Details</h3>
                 <div class="sidebar-input-group">
                     <label for="loan_amount"><span class="field-icon">🏦</span> Loan Amount (₹)</label>
                     <input type="number" id="loan_amount" name="loan_amount" min="10000" value="200000" required>
@@ -105,21 +96,11 @@
                     </span>
                 </button>
             </form>
-        </div>
 
-        <!-- Sidebar Footer -->
-        <div class="sidebar-footer">
-            <p>© 2026 Data Vidwan</p>
-        </div>
-    </aside>
+            <p class="side-footer">© 2026 Data Vidwan</p>
+        </aside>
 
-    <!-- Mobile Sidebar Toggle -->
-    <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle Sidebar">
-        <span></span><span></span><span></span>
-    </button>
-    <div class="sidebar-overlay" id="sidebarOverlay"></div>
-
-    <!-- ======== MAIN CONTENT ======== -->
+        <!-- ======== MAIN CONTENT ======== -->
     <main class="main-content" id="mainContent">
 
         <!-- Animated background particles -->

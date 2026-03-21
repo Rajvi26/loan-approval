@@ -4,14 +4,50 @@
 # using machine learning models (Random Forest Classifier)
 # ============================================================
 
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, redirect, url_for, session, flash
 import pandas as pd
 import numpy as np
 from sklearn.preprocessing import StandardScaler
 from sklearn.ensemble import RandomForestClassifier
+import sqlite3
+import os
+from werkzeug.security import generate_password_hash, check_password_hash
+import secrets
+import re
 
 # Flask API
 app = Flask(__name__)
+app.secret_key = secrets.token_hex(16)  # Generate a random secret key
+
+# Flask API
+app = Flask(__name__)
+app.secret_key = secrets.token_hex(16)  # Generate a random secret key
+
+# Database setup
+DATABASE = 'users.db'
+
+def get_db():
+    db = sqlite3.connect(DATABASE)
+    db.row_factory = sqlite3.Row
+    return db
+
+def init_db():
+    with app.app_context():
+        db = get_db()
+        db.execute('''CREATE TABLE IF NOT EXISTS users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            email TEXT UNIQUE NOT NULL,
+            password TEXT NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )''')
+        db.commit()
+
+# Initialize database
+init_db()
+
+def validate_email(email):
+    pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+    return re.match(pattern, email) is not None
 
 # =========================
 # EMI FUNCTION
@@ -61,11 +97,188 @@ model, scaler, columns = train_model()
 print("✅ Model ready!")
 
 # =========================
+# AUTHENTICATION ROUTES
+# =========================
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    if request.method == "POST":
+        email = request.form.get("email")
+        password = request.form.get("password")
+        
+        if not validate_email(email):
+            flash('Please enter a valid email address', 'error')
+            return render_template("login.html")
+        
+        db = get_db()
+        user = db.execute('SELECT * FROM users WHERE email = ?', (email,)).fetchone()
+        
+        if user and check_password_hash(user['password'], password):
+            session['user_id'] = user['id']
+            session['email'] = user['email']
+            flash('Login successful!', 'success')
+            return redirect(url_for('predict_page'))
+        else:
+            flash('Invalid email or password', 'error')
+    
+    return render_template("login.html")
+
+@app.route("/signup", methods=["GET", "POST"])
+def signup():
+    if request.method == "POST":
+        email = request.form.get("email")
+        password = request.form.get("password")
+        confirm_password = request.form.get("confirm_password")
+        
+        if not validate_email(email):
+            flash('Please enter a valid email address', 'error')
+            return render_template("signup.html")
+        
+        if password != confirm_password:
+            flash('Passwords do not match', 'error')
+            return render_template("signup.html")
+        
+        if len(password) < 6:
+            flash('Password must be at least 6 characters long', 'error')
+            return render_template("signup.html")
+        
+        hashed_password = generate_password_hash(password)
+        
+        db = get_db()
+        try:
+            db.execute('INSERT INTO users (email, password) VALUES (?, ?)', (email, hashed_password))
+            db.commit()
+            # Get the user id
+            user = db.execute('SELECT id FROM users WHERE email = ?', (email,)).fetchone()
+            session['user_id'] = user['id']
+            session['email'] = email
+            flash('Account created successfully!', 'success')
+            return redirect(url_for('predict_page'))
+        except sqlite3.IntegrityError:
+            flash('Email already exists', 'error')
+    
+    return render_template("signup.html")
+
+@app.route("/forgot-password", methods=["GET", "POST"])
+def forgot_password():
+    if request.method == "POST":
+        email = request.form.get("email")
+        
+        if not validate_email(email):
+            flash('Please enter a valid email address', 'error')
+            return render_template("forgot_password.html")
+        
+        db = get_db()
+        user = db.execute('SELECT * FROM users WHERE email = ?', (email,)).fetchone()
+        
+        if user:
+            # For simplicity, reset to a default password
+            # In production, send email with reset link
+            default_password = "reset123"
+            hashed_password = generate_password_hash(default_password)
+            db.execute('UPDATE users SET password = ? WHERE email = ?', (hashed_password, email))
+            db.commit()
+            flash(f'Password reset to: {default_password}. Please change it after login.', 'success')
+        else:
+            flash('Email not found', 'error')
+    
+    return render_template("forgot_password.html")
+
+@app.route("/logout")
+def logout():
+    session.clear()
+    flash('Logged out successfully', 'success')
+    return redirect(url_for('login'))
+
+@app.route("/predict")
+def predict_page():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    return render_template("index.html")
+
+# =========================
+# API ROUTES
+# =========================
+
+@app.route("/api/signup", methods=["POST"])
+def api_signup():
+    data = request.get_json()
+    email = data.get("email")
+    password = data.get("password")
+    
+    if not email or not password:
+        return jsonify({"status": "error", "message": "Email and password required"}), 400
+    
+    hashed_password = generate_password_hash(password)
+    
+    db = get_db()
+    try:
+        db.execute('INSERT INTO users (email, password) VALUES (?, ?)', (email, hashed_password))
+        db.commit()
+        return jsonify({"status": "success", "message": "Account created successfully"})
+    except sqlite3.IntegrityError:
+        return jsonify({"status": "error", "message": "Email already exists"}), 400
+
+@app.route("/api/login", methods=["POST"])
+def api_login():
+    data = request.get_json()
+    email = data.get("email")
+    password = data.get("password")
+    
+    if not email or not password:
+        return jsonify({"status": "error", "message": "Email and password required"}), 400
+    
+    db = get_db()
+    user = db.execute('SELECT * FROM users WHERE email = ?', (email,)).fetchone()
+    
+    if user and check_password_hash(user['password'], password):
+        session['user_id'] = user['id']
+        session['email'] = user['email']
+        return jsonify({"status": "success", "message": "Login successful", "user": {"email": user['email']}})
+    else:
+        return jsonify({"status": "error", "message": "Invalid email or password"}), 401
+
+@app.route("/api/forgot-password", methods=["POST"])
+def api_forgot_password():
+    data = request.get_json()
+    email = data.get("email")
+    
+    if not email:
+        return jsonify({"status": "error", "message": "Email required"}), 400
+    
+    db = get_db()
+    user = db.execute('SELECT * FROM users WHERE email = ?', (email,)).fetchone()
+    
+    if user:
+        # For simplicity, reset to a default password
+        default_password = "reset123"
+        hashed_password = generate_password_hash(default_password)
+        db.execute('UPDATE users SET password = ? WHERE email = ?', (hashed_password, email))
+        db.commit()
+        return jsonify({"status": "success", "message": f"Password reset to: {default_password}"})
+    else:
+        return jsonify({"status": "error", "message": "Email not found"}), 404
+
+@app.route("/api/logout", methods=["POST"])
+def api_logout():
+    session.clear()
+    return jsonify({"status": "success", "message": "Logged out successfully"})
+
+@app.route("/api/check-auth")
+def check_auth():
+    if 'user_id' in session:
+        return jsonify({"authenticated": True, "user": {"email": session['email']}})
+    else:
+        return jsonify({"authenticated": False}), 401
+
+# =========================
 # ROUTES
 # =========================
 @app.route("/")
 def index():
-    return render_template("index.html")
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    return redirect(url_for('predict_page'))
 
 @app.route("/predict", methods=["POST"])
 def predict():
