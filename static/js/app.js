@@ -129,6 +129,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const payload = {
             age: document.getElementById("age").value,
+            employment_type: document.getElementById("employment_type").value,
             income: document.getElementById("income").value,
             loan_amount: document.getElementById("loan_amount").value,
             credit_score: document.getElementById("credit_score").value,

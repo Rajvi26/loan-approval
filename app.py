@@ -7,7 +7,7 @@
 from flask import Flask, render_template, request, jsonify, redirect, url_for, session, flash
 import pandas as pd
 import numpy as np
-from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import StandardScaler, LabelEncoder
 from sklearn.ensemble import RandomForestClassifier
 import sqlite3
 import os
@@ -66,6 +66,7 @@ def train_model():
 
     df = pd.DataFrame({
         "Age": np.random.randint(22, 60, 2000),
+        "EmploymentType": np.random.choice(["Salaried", "Business",  "Part time"], 2000),
         "Income": np.random.randint(20000, 150000, 2000),
         "LoanAmount": np.random.randint(10000, 500000, 2000),
         "CreditScore": np.random.randint(300, 850, 2000),
@@ -76,6 +77,10 @@ def train_model():
         "DTIRatio": np.random.uniform(0.1, 0.9, 2000),
         "Default": np.random.choice([0,1], 2000, p=[0.8,0.2])
     })
+
+    # Encode categorical EmploymentType
+    le = LabelEncoder()
+    df["EmploymentType"] = le.fit_transform(df["EmploymentType"])
 
     df["EMI"] = df.apply(lambda x: calculate_emi(x["LoanAmount"], x["InterestRate"], x["LoanTerm"]), axis=1)
     df["Income_to_EMI"] = df["Income"] / (df["EMI"]+1)
@@ -89,11 +94,11 @@ def train_model():
     model = RandomForestClassifier()
     model.fit(X_scaled, y)
 
-    return model, scaler, X.columns
+    return model, scaler, X.columns, le
 
 # Train once at startup
 print("🔄 Training model...")
-model, scaler, columns = train_model()
+model, scaler, columns, le = train_model()
 print("✅ Model ready!")
 
 # =========================
@@ -286,6 +291,7 @@ def predict():
         data = request.get_json()
 
         age = int(data["age"])
+        employment_type = data["employment_type"]
         income = int(data["income"])
         loan_amount = int(data["loan_amount"])
         credit_score = int(data["credit_score"])
@@ -303,6 +309,7 @@ def predict():
                 "rejection_reasons": rejection_reasons,
                 "applicant_snapshot": {
                     "Age": age,
+                    "Employment Type": employment_type,
                     "Monthly Income": f"₹{income:,}",
                     "Loan Amount": f"₹{loan_amount:,}",
                     "Credit Score": credit_score,
@@ -438,7 +445,8 @@ def predict():
             reasons.append("EMI within safe limit")
 
         # ML INPUT
-        input_data = pd.DataFrame([[age, income, loan_amount, credit_score,
+        employment_type_encoded = le.transform([employment_type])[0]
+        input_data = pd.DataFrame([[age, employment_type_encoded, income, loan_amount, credit_score,
                                     months_employed, num_credit_lines,
                                     interest, loan_term, emi_ratio,
                                     emi, income/(emi+1)]],
