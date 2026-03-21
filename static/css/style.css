@@ -1144,3 +1144,740 @@ body {
     border: 1px solid rgba(255, 120, 123, 0.45);
     color: #ffccd5;
 }
+
+/* ============================================
+   RESULT PANELS & REPORTS
+   ============================================ */
+
+/* ---- Result Panel Container ---- */
+.result-panel {
+    margin: 30px 0;
+    animation: slideDown 0.5s ease-out;
+}
+
+/* ---- Result Cards ---- */
+.result-card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: var(--r-lg);
+    padding: 24px;
+    margin-bottom: 30px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    animation: resultPop 0.6s ease-out;
+}
+
+.result-card.approved {
+    border-color: var(--green);
+    box-shadow: 0 8px 32px var(--green-glow);
+}
+
+.result-card.rejected {
+    border-color: var(--red);
+    box-shadow: 0 8px 32px var(--red-glow);
+}
+
+.result-card.error {
+    border-color: var(--amber);
+    box-shadow: 0 8px 32px rgba(245, 158, 11, 0.15);
+}
+
+/* ---- Result Status ---- */
+.result-status {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.result-status-icon {
+    font-size: 2.5rem;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.result-card.approved .result-status-icon {
+    background: var(--green-glow);
+    border-color: var(--green);
+    color: var(--green);
+}
+
+.result-card.rejected .result-status-icon {
+    background: var(--red-glow);
+    border-color: var(--red);
+    color: var(--red);
+}
+
+.result-card.error .result-status-icon {
+    background: rgba(245, 158, 11, 0.15);
+    border-color: var(--amber);
+    color: var(--amber);
+}
+
+.result-status-text h3 {
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-bottom: 4px;
+    color: var(--text-primary);
+}
+
+.result-status-text p {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+/* ---- Result Metrics ---- */
+.result-metrics {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.metric-box {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: var(--r-md);
+    padding: 16px;
+    text-align: center;
+    transition: var(--ease);
+}
+
+.metric-box:hover {
+    border-color: rgba(255, 255, 255, 0.1);
+    transform: translateY(-2px);
+}
+
+.metric-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+}
+
+.metric-value {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+/* ---- Probability Bar ---- */
+.prob-bar-container {
+    margin-bottom: 24px;
+}
+
+.prob-bar-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+}
+
+.prob-bar {
+    height: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.prob-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--green), var(--accent));
+    border-radius: 4px;
+    transition: width 1.2s ease-out;
+    width: 0;
+}
+
+.prob-bar-fill.good {
+    background: linear-gradient(90deg, var(--green), #10b981);
+}
+
+/* ---- Result Details ---- */
+.result-details {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: var(--r-md);
+    padding: 20px;
+}
+
+.result-details h4 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.detail-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 0;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.check {
+    color: var(--green);
+    font-size: 1.1rem;
+    font-weight: bold;
+}
+
+.cross {
+    color: var(--red);
+    font-size: 1.1rem;
+    font-weight: bold;
+}
+
+/* ============================================
+   APPROVAL REPORT
+   ============================================ */
+
+.approval-report {
+    background: linear-gradient(135deg, rgba(34, 197, 94, 0.05), rgba(79, 125, 249, 0.05));
+    border: 1px solid rgba(34, 197, 94, 0.2);
+    border-radius: var(--r-lg);
+    overflow: hidden;
+    box-shadow: 0 12px 40px var(--green-glow);
+    animation: slideUp 0.7s ease-out 0.2s both;
+}
+
+.report-header {
+    background: linear-gradient(135deg, var(--green), #10b981);
+    padding: 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    color: white;
+}
+
+.report-header-icon {
+    font-size: 2rem;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 50%;
+    backdrop-filter: blur(10px);
+}
+
+.report-header h3 {
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+.report-timestamp {
+    font-size: 0.85rem;
+    opacity: 0.9;
+    font-weight: 500;
+}
+
+/* ---- Report Summary ---- */
+.report-summary {
+    padding: 24px;
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    background: rgba(34, 197, 94, 0.05);
+    border-bottom: 1px solid rgba(34, 197, 94, 0.1);
+}
+
+.report-summary-icon {
+    font-size: 1.5rem;
+    color: var(--green);
+    margin-top: 2px;
+}
+
+.report-summary p {
+    color: var(--text-primary);
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin: 0;
+}
+
+/* ---- Report Sections ---- */
+.report-section {
+    padding: 24px;
+    border-bottom: 1px solid var(--card-border);
+}
+
+.report-section:last-child {
+    border-bottom: none;
+}
+
+.report-section h4 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.report-section-icon {
+    font-size: 1.2rem;
+}
+
+/* ---- Approval Details Grid ---- */
+.approval-details-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+}
+
+.approval-detail-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: var(--r-md);
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: var(--ease);
+}
+
+.approval-detail-card:hover {
+    border-color: rgba(34, 197, 94, 0.3);
+    transform: translateY(-2px);
+}
+
+.detail-icon {
+    font-size: 1.5rem;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--green-glow);
+    border-radius: 50%;
+    color: var(--green);
+}
+
+.detail-info {
+    flex: 1;
+}
+
+.detail-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+}
+
+.detail-value {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+/* ---- Strengths List ---- */
+.strengths-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.strength-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px;
+    background: rgba(34, 197, 94, 0.05);
+    border: 1px solid rgba(34, 197, 94, 0.1);
+    border-radius: var(--r-md);
+}
+
+.strength-number {
+    font-size: 1.1rem;
+    color: var(--green);
+    font-weight: bold;
+    margin-top: 1px;
+}
+
+.strength-text {
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+/* ---- Next Steps ---- */
+.next-steps-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.step-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 16px;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: var(--r-md);
+    transition: var(--ease);
+}
+
+.step-item:hover {
+    border-color: rgba(79, 125, 249, 0.2);
+    background: rgba(79, 125, 249, 0.02);
+}
+
+.step-number {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--accent);
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--accent-glow);
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.step-info {
+    flex: 1;
+}
+
+.step-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+    display: block;
+}
+
+.step-description {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+}
+
+/* ---- Terms Box ---- */
+.terms-box {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: var(--r-md);
+    padding: 20px;
+}
+
+.terms-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.terms-list li {
+    padding: 8px 0;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    position: relative;
+    padding-left: 20px;
+}
+
+.terms-list li:before {
+    content: "•";
+    color: var(--accent);
+    font-weight: bold;
+    position: absolute;
+    left: 0;
+}
+
+/* ---- Report Footer ---- */
+.report-footer {
+    padding: 24px;
+    background: rgba(34, 197, 94, 0.05);
+    border-top: 1px solid rgba(34, 197, 94, 0.1);
+    text-align: center;
+}
+
+.report-footer p {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    line-height: 1.5;
+    margin: 0 0 8px 0;
+}
+
+.footer-gratitude {
+    color: var(--green) !important;
+    font-weight: 600;
+}
+
+/* ============================================
+   REJECTION REPORT
+   ============================================ */
+
+.rejection-report {
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.05), rgba(245, 158, 11, 0.05));
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    border-radius: var(--r-lg);
+    overflow: hidden;
+    box-shadow: 0 12px 40px var(--red-glow);
+    animation: slideUp 0.7s ease-out 0.2s both;
+}
+
+.rejection-header {
+    background: linear-gradient(135deg, var(--red), #dc2626);
+}
+
+.rejection-summary {
+    background: rgba(239, 68, 68, 0.05);
+    border-bottom: 1px solid rgba(239, 68, 68, 0.1);
+}
+
+/* ---- Rejection Reasons Grid ---- */
+.report-reasons-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 16px;
+}
+
+.report-reason-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: var(--r-md);
+    padding: 20px;
+    transition: var(--ease);
+}
+
+.report-reason-card:hover {
+    border-color: rgba(239, 68, 68, 0.2);
+    transform: translateY(-2px);
+}
+
+.reason-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.reason-dot {
+    width: 8px;
+    height: 8px;
+    background: var(--red);
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.reason-description {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    line-height: 1.5;
+    margin-bottom: 16px;
+}
+
+/* ---- Reason Comparison ---- */
+.reason-comparison {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: var(--r-sm);
+}
+
+.comparison-item {
+    flex: 1;
+    text-align: center;
+}
+
+.comparison-item.yours {
+    background: rgba(239, 68, 68, 0.1);
+    padding: 8px;
+    border-radius: var(--r-sm);
+}
+
+.comparison-item.required {
+    background: rgba(34, 197, 94, 0.1);
+    padding: 8px;
+    border-radius: var(--r-sm);
+}
+
+.comparison-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+    display: block;
+}
+
+.comparison-value {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.comparison-arrow {
+    color: var(--text-muted);
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+/* ---- Applicant Snapshot ---- */
+.snapshot-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+}
+
+.snapshot-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: var(--r-sm);
+}
+
+.snapshot-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.snapshot-value {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+/* ---- Suggestions List ---- */
+.suggestions-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.suggestion-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px;
+    background: rgba(245, 158, 11, 0.05);
+    border: 1px solid rgba(245, 158, 11, 0.1);
+    border-radius: var(--r-md);
+    transition: var(--ease);
+}
+
+.suggestion-item:hover {
+    border-color: rgba(245, 158, 11, 0.3);
+    background: rgba(245, 158, 11, 0.08);
+}
+
+.suggestion-number {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--amber);
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(245, 158, 11, 0.15);
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 1px;
+}
+
+.suggestion-text {
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+/* ============================================
+   MOBILE RESPONSIVE FOR REPORTS
+   ============================================ */
+
+@media (max-width: 768px) {
+    .result-status {
+        flex-direction: column;
+        text-align: center;
+        gap: 12px;
+    }
+
+    .result-metrics {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+    }
+
+    .approval-details-grid,
+    .report-reasons-grid,
+    .snapshot-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .reason-comparison {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .comparison-arrow {
+        display: none;
+    }
+
+    .report-header {
+        padding: 20px;
+        flex-direction: column;
+        text-align: center;
+        gap: 12px;
+    }
+
+    .report-section {
+        padding: 20px;
+    }
+
+    .next-steps-list .step-item {
+        flex-direction: column;
+        gap: 10px;
+        text-align: center;
+    }
+}
+
+@media (max-width: 500px) {
+    .result-metrics {
+        grid-template-columns: 1fr;
+    }
+
+    .approval-detail-card,
+    .report-reason-card {
+        padding: 14px;
+    }
+
+    .snapshot-item {
+        flex-direction: column;
+        gap: 6px;
+        text-align: center;
+        padding: 10px;
+    }
+}
