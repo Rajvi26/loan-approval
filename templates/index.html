@@ -9,35 +9,56 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
 
-    <!-- ======== NAVBAR ======== -->
-    <header class="navbar">
-        <div class="navbar-left">
-            <div class="navbar-brand">
-                <img src="{{ url_for('static', filename='data_vidwan_logo.png') }}" alt="Data Vidwan" class="logo-img">
-                <span>AI Loan Approval System</span>
-            </div>
-            <nav class="navbar-nav">
-                <a href="#" class="nav-link active" data-section="predict">Loan Prediction</a>
-                <a href="#" class="nav-link" data-section="emi-calc">EMI Calculator</a>
-                <a href="#" class="nav-link" data-section="about">About</a>
-            </nav>
+    <!-- ===== TOP NAVBAR ===== -->
+<header class="top-navbar">
+    <div class="nav-left">
+        <!-- <span class="menu-btn" onclick="toggleSidebar()">☰</span> -->
+           <!-- Logo -->
+        <div class="sidebar-logo">
+            <img src="{{ url_for('static', filename='data_vidwan_logo.png') }}" alt="Data Vidwan" class="logo-img">
         </div>
+    </div>
 
-        <div class="navbar-right">
-            <div class="user-profile">
-                <span class="profile-icon">👤</span>
+    <div class="nav-right">
+         <div class="user-profile">
+                <i class="fas fa-user profile-icon"></i>
                 <span class="user-email">{{ session.email }}</span>
                 <a href="{{ url_for('logout') }}" class="logout-link-top">Logout</a>
             </div>
-        </div>
-    </header>
+    </div>
+</header>
+    <!-- ======== SIDEBAR ======== -->
+    <aside class="sidebar" id="sidebar">
+     
+        <div class="sidebar-divider"></div>
 
-    <div class="page-container">
-        <aside class="side-panel">
-            <h2>Applicant Details</h2>
+        <!-- Navigation / Options -->
+        <nav class="sidebar-nav">
+            <div class="nav-label">Navigation</div>
+            <a href="#" class="nav-item active" data-section="predict">
+                <span class="nav-icon">🤖</span>
+                <span class="nav-text">Loan Prediction</span>
+            </a>
+            <a href="#" class="nav-item" data-section="emi-calc">
+                <span class="nav-icon">🧮</span>
+                <span class="nav-text">EMI Calculator</span>
+            </a>
+            <a href="#" class="nav-item" data-section="about">
+                <span class="nav-icon">ℹ️</span>
+                <span class="nav-text">About System</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-divider"></div>
+
+        <!-- User Inputs in Sidebar -->
+        <div class="sidebar-form-section">
+            <div class="nav-label">Applicant Details</div>
+
             <form id="loanForm" autocomplete="off">
                 <div class="sidebar-input-group">
                     <label for="age"><span class="field-icon">👤</span> Age</label>
@@ -67,7 +88,10 @@
                     <input type="number" id="num_credit_lines" name="num_credit_lines" min="0" value="2" required>
                 </div>
 
-                <h3>Loan Details</h3>
+                <div class="sidebar-divider"></div>
+
+                <div class="nav-label">Loan Details</div>
+
                 <div class="sidebar-input-group">
                     <label for="loan_amount"><span class="field-icon">🏦</span> Loan Amount (₹)</label>
                     <input type="number" id="loan_amount" name="loan_amount" min="10000" value="200000" required>
@@ -96,11 +120,21 @@
                     </span>
                 </button>
             </form>
+        </div>
 
-            <p class="side-footer">© 2026 Data Vidwan</p>
-        </aside>
+        <!-- Sidebar Footer -->
+        <div class="sidebar-footer">
+            <p>© 2026 Data Vidwan</p>
+        </div>
+    </aside>
 
-        <!-- ======== MAIN CONTENT ======== -->
+    <!-- Mobile Sidebar Toggle -->
+    <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle Sidebar">
+        <span></span><span></span><span></span>
+    </button>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- ======== MAIN CONTENT ======== -->
     <main class="main-content" id="mainContent">
 
         <!-- Animated background particles -->
