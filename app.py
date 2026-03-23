@@ -32,11 +32,13 @@ def init_db():
     with app.app_context():
         db = get_db()
         db.execute('''CREATE TABLE IF NOT EXISTS users (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            email TEXT UNIQUE NOT NULL,
-            password TEXT NOT NULL,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )''')
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT,
+        phone TEXT,
+        email TEXT UNIQUE NOT NULL,
+        password TEXT NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )''')
         db.commit()
 
 # Initialize database
@@ -102,6 +104,8 @@ print("✅ Model ready!")
 # AUTHENTICATION ROUTES
 # =========================
 
+#----------LOGIN ROUTE----------
+
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
@@ -125,41 +129,56 @@ def login():
     
     return render_template("login.html")
 
+#----------SIGNUP ROUTE----------
+
 @app.route("/signup", methods=["GET", "POST"])
 def signup():
     if request.method == "POST":
+
+        name = request.form.get("name")
+        phone = request.form.get("phone")
         email = request.form.get("email")
         password = request.form.get("password")
         confirm_password = request.form.get("confirm_password")
-        
+
         if not validate_email(email):
             flash('Please enter a valid email address', 'error')
             return render_template("signup.html")
-        
+
         if password != confirm_password:
             flash('Passwords do not match', 'error')
             return render_template("signup.html")
-        
+
         if len(password) < 6:
             flash('Password must be at least 6 characters long', 'error')
             return render_template("signup.html")
-        
+
         hashed_password = generate_password_hash(password)
-        
+
         db = get_db()
+
         try:
-            db.execute('INSERT INTO users (email, password) VALUES (?, ?)', (email, hashed_password))
+            db.execute(
+                'INSERT INTO users (name, phone, email, password) VALUES (?, ?, ?, ?)',
+                (name, phone, email, hashed_password)
+            )
             db.commit()
-            # Get the user id
-            user = db.execute('SELECT id FROM users WHERE email = ?', (email,)).fetchone()
+
+            user = db.execute('SELECT * FROM users WHERE email = ?', (email,)).fetchone()
+
             session['user_id'] = user['id']
-            session['email'] = email
+            session['email'] = user['email']
+            session['name'] = user['name']
+
             flash('Account created successfully!', 'success')
             return redirect(url_for('predict_page'))
+
         except sqlite3.IntegrityError:
             flash('Email already exists', 'error')
-    
+
     return render_template("signup.html")
+
+#------------FORGOT PASSWORD ROUTE----------
 
 @app.route("/forgot-password", methods=["GET", "POST"])
 def forgot_password():

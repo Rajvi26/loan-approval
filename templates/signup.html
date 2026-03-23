@@ -24,26 +24,46 @@
                     {% endfor %}
                 {% endif %}
             {% endwith %}
-            
+
             <form method="POST">
+
+                <!-- NAME -->
+                <div class="form-group">
+                    <label for="name">Full Name</label>
+                    <input type="text" id="name" name="name" required placeholder="Enter your full name">
+                </div>
+
+                <!-- PHONE -->
+                <div class="form-group">
+                    <label for="phone">Phone Number</label>
+                    <input type="tel" id="phone" name="phone" required 
+                           pattern="[0-9]{10}" 
+                           placeholder="Enter 10 digit phone number">
+                </div>
+
+                <!-- EMAIL -->
                 <div class="form-group">
                     <label for="email">Email</label>
-                    <input type="email" id="email" name="email" required pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}">
+                    <input type="email" id="email" name="email" required 
+                           pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}">
                 </div>
                 
+                <!-- PASSWORD -->
                 <div class="form-group">
                     <label for="password">Password</label>
                     <input type="password" id="password" name="password" required minlength="6">
                 </div>
                 
+                <!-- CONFIRM PASSWORD -->
                 <div class="form-group">
                     <label for="confirm_password">Confirm Password</label>
                     <input type="password" id="confirm_password" name="confirm_password" required minlength="6">
                 </div>
                 
                 <button type="submit" class="btn btn-primary">Sign Up</button>
+
             </form>
-            
+
             <div class="auth-links">
                 <p>Already have an account? <a href="{{ url_for('login') }}">Login</a></p>
             </div>
