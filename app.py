@@ -65,7 +65,7 @@ def train_model():
 
     df = pd.DataFrame({
         "Age": np.random.randint(22, 60, 2000),
-        "EmploymentType": np.random.choice(["Salaried", "Business",  "Part time"], 2000),
+        "EmploymentType": np.random.choice(["Salaried", "Business",  "Part time", "Student"], 2000),
         "Income": np.random.randint(20000, 150000, 2000),
         "LoanAmount": np.random.randint(10000, 500000, 2000),
         "CreditScore": np.random.randint(300, 850, 2000),
