@@ -19,9 +19,6 @@ import re
 app = Flask(__name__)
 app.secret_key = secrets.token_hex(16)  # Generate a random secret key
 
-# Flask API
-app = Flask(__name__)
-app.secret_key = secrets.token_hex(16)  # Generate a random secret key
 
 # Database setup
 DATABASE = 'users.db'
@@ -550,4 +547,4 @@ def predict():
 
 
 if __name__ == "__main__":
-    app.run(debug=True, port=5000)
+    app.run()
