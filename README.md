@@ -1,147 +1,91 @@
-# Loan-Prediction-using-Machine-Learning
+# Loan Approval Prediction System
+
+## Description
+
+This is a Flask-based web application that predicts loan approval eligibility using machine learning models. The system includes user authentication, a responsive web interface, and detailed prediction reports with rejection reasons and suggestions.
 
 ## Features
 
-- AI-powered loan approval prediction using Machine Learning (Random Forest Classifier)
-- User authentication system with registration, login, and password reset
-- SQLite database for user data storage
-- RESTful APIs for authentication
-- Responsive web interface
+- **Machine Learning Prediction**: Uses Random Forest Classifier trained on synthetic loan data to predict approval likelihood
+- **User Authentication**: Secure registration, login, and password reset functionality
+- **Detailed Reports**: Provides comprehensive rejection reports with specific reasons and improvement suggestions
+- **Web Interface**: Responsive frontend built with HTML, CSS, and JavaScript
+- **RESTful APIs**: API endpoints for authentication and prediction
+- **SQLite Database**: Local database for user management
 
-## User Authentication
+## Technologies Used
 
-### Web Pages
-- **Login**: `/login` - User login form
-- **Signup**: `/signup` - User registration form  
-- **Forgot Password**: `/forgot-password` - Password reset form
-- **Logout**: `/logout` - User logout
-
-### API Endpoints
-
-#### POST /api/signup
-Create a new user account.
-
-**Request Body:**
-```json
-{
-  "email": "user@example.com",
-  "password": "password123"
-}
-```
-
-**Response:**
-```json
-{
-  "status": "success",
-  "message": "Account created successfully"
-}
-```
-
-#### POST /api/login
-Authenticate a user.
-
-**Request Body:**
-```json
-{
-  "email": "user@example.com", 
-  "password": "password123"
-}
-```
-
-**Response:**
-```json
-{
-  "status": "success",
-  "message": "Login successful",
-  "user": {
-    "email": "user@example.com"
-  }
-}
-```
-
-#### POST /api/forgot-password
-Reset user password (resets to default password).
-
-**Request Body:**
-```json
-{
-  "email": "user@example.com"
-}
-```
-
-**Response:**
-```json
-{
-  "status": "success", 
-  "message": "Password reset to: reset123"
-}
-```
-
-#### GET /api/check-auth
-Check if user is authenticated.
-
-**Response (authenticated):**
-```json
-{
-  "authenticated": true,
-  "user": {
-    "email": "user@example.com"
-  }
-}
-```
-
-**Response (not authenticated):**
-```json
-{
-  "authenticated": false
-}
-```
-
-#### POST /api/logout
-Logout user.
-
-**Response:**
-```json
-{
-  "status": "success",
-  "message": "Logged out successfully"
-}
-```
+- **Backend**: Flask (Python)
+- **Machine Learning**: scikit-learn (Random Forest)
+- **Database**: SQLite
+- **Frontend**: HTML, CSS, JavaScript
+- **Data Processing**: Pandas, NumPy
 
 ## Installation
 
-1. Install dependencies:
-```bash
-pip install -r requirements.txt
-```
+1. Clone the repository or download the project files.
 
-2. Run the application:
-```bash
-python app.py
-```
+2. Install the required dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-3. Open http://localhost:5000 in your browser
+3. Run the application:
+   ```bash
+   python app.py
+   ```
 
-## Database
+4. Open your browser and navigate to `http://localhost:5000`
 
-User data is stored in `users.db` SQLite database with the following schema:
+## Usage
+
+1. **Register**: Create a new account using the signup page.
+2. **Login**: Authenticate with your email and password.
+3. **Predict Loan Approval**: Fill in the loan application form with details like age, income, loan amount, etc.
+4. **View Results**: Get instant prediction results with detailed reports if rejected.
+
+## Dataset
+
+The project includes `logical_realistic_loan_dataset.csv` which contains realistic loan application data for analysis and testing.
+
+## Jupyter Notebook
+
+`FINALIST_LOAN_APPROVAL_PROJECT.ipynb` contains the data analysis, model training, and evaluation code.
+
+## API Endpoints
+
+### Authentication
+
+- `POST /api/signup` - User registration
+- `POST /api/login` - User login
+- `POST /api/forgot-password` - Password reset
+- `POST /api/logout` - User logout
+- `GET /api/check-auth` - Check authentication status
+
+### Prediction
+
+- `POST /predict` - Submit loan application for prediction
+
+## Database Schema
 
 ```sql
 CREATE TABLE users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT,
+    phone TEXT,
     email TEXT UNIQUE NOT NULL,
     password TEXT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 ```
 
-## Security Notes
+## Security Considerations
 
-- Passwords are hashed using Werkzeug security
+- Passwords are securely hashed using Werkzeug
 - Session-based authentication
-- For production use, consider:
-  - Email verification for signup
-  - Proper email-based password reset
-  - Rate limiting
-  - HTTPS
-  - Password strength requirements
+- Input validation for email and passwords
+- For production deployment, consider additional security measures like HTTPS, rate limiting, and email verification.
+
+## Contributing
+
+Feel free to contribute by submitting issues or pull requests.
